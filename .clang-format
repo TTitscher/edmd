@@ -1,0 +1,25 @@
+BasedOnStyle: LLVM
+Language: Cpp
+
+AlignAfterOpenBracket: Align
+AlignOperands: true
+AlignConsecutiveAssignments: false
+AlignConsecutiveDeclarations: false
+AlignTrailingComments: false
+AlwaysBreakTemplateDeclarations: true
+AccessModifierOffset: -4
+BreakBeforeBraces: Allman
+ColumnLimit: 120
+AllowShortBlocksOnASingleLine: true
+AllowShortFunctionsOnASingleLine: true
+AllowShortIfStatementsOnASingleLine: true
+ContinuationIndentWidth: 8
+DerivePointerAlignment: false
+IndentWidth: 4
+PointerAlignment: Left
+ReflowComments: true
+MaxEmptyLinesToKeep: 2
+BreakConstructorInitializersBeforeComma: true
+SpaceBeforeParens: ControlStatements
+SortIncludes: true
+Standard: Cpp11
