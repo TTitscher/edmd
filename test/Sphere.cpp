@@ -1,7 +1,3 @@
-YAML:25:11: error: unknown enumerated scalar
-Standard: Cpp14
-          ^~~~~
-Error reading /home/schmaus/edmd/.clang-format: Invalid argument
 #include "Sphere.h"
 #include "BoostUnitTest.h"
 #include <iostream>

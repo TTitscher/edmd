@@ -11,8 +11,8 @@ AccessModifierOffset: -4
 BreakBeforeBraces: Allman
 ColumnLimit: 120
 AllowShortBlocksOnASingleLine: true
-AllowShortFunctionsOnASingleLine: true
-AllowShortIfStatementsOnASingleLine: true
+AllowShortFunctionsOnASingleLine: false
+AllowShortIfStatementsOnASingleLine: false
 ContinuationIndentWidth: 8
 DerivePointerAlignment: false
 IndentWidth: 4

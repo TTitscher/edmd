@@ -1,3 +1,8 @@
-add_executable(Sphere Sphere.cpp)
-target_link_libraries(Sphere Eigen3::Eigen Boost::unit_test_framework)
-add_test(unit::Sphere Sphere)
+foreach(unittest 
+        SphereVsSphere 
+        SphereVsPlane)
+
+    add_executable(${unittest} ${unittest}.cpp)
+    target_link_libraries(${unittest} Eigen3::Eigen Boost::unit_test_framework)
+    add_test(unit::${unittest} ${unittest})
+endforeach()
