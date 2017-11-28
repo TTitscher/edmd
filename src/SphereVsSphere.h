@@ -1,4 +1,5 @@
 #pragma once
+#include "Constants.h"
 #include "Sphere.h"
 #include <stdexcept>
 
@@ -73,15 +74,14 @@ double PredictedCollisionTime(const Sphere& sphere1, const Sphere& sphere2)
 
     if (c < -2.e-10 * s1.radius)
     {
-        throw std::runtime_error(
-                                 "Sphere " + std::to_string(s1.id) + " overlaps with Sphere " + std::to_string(s2.id));
+        throw std::runtime_error("Sphere " + std::to_string(s1.id) + " overlaps with Sphere " + std::to_string(s2.id));
     }
 
     double discriminant = b * b - 4 * a * c;
 
     // allow small negative values ...
     if (discriminant < -1e-12)
-        return -1;
+        return Inf();
 
     // ... an treat them as zero
     discriminant = std::max(discriminant, 0.);
@@ -92,6 +92,6 @@ double PredictedCollisionTime(const Sphere& sphere1, const Sphere& sphere2)
     if (a < 0.)
         return baseTime + (-b - std::sqrt(discriminant)) / (2 * a);
 
-    return -1.;
+    return Inf();
 }
 } /* EDMD */

@@ -54,5 +54,5 @@ BOOST_AUTO_TEST_CASE(Grow)
     std::tie(s1.velocity, s2.velocity) = VelocityAfterCollision(s1, s2);
 
     // no more collisions expected
-    BOOST_CHECK_CLOSE(PredictedCollisionTime(s1, s2), -1., 1.e-10);
+    BOOST_CHECK_CLOSE(PredictedCollisionTime(s1, s2), Inf(), 1.e-10);
 }

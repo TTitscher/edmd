@@ -1,4 +1,5 @@
 #pragma once
+#include "Constants.h"
 #include "Plane.h"
 #include "Sphere.h"
 
@@ -23,12 +24,12 @@ double PredictedCollisionTime(Sphere s, Plane p)
 
     if (staticDistanceToWall < 1e-15 && dynamicDistanceToWall >= 0)
         // sphere touches wall, not penetrating it in the future.
-        return -1.;
+        return Inf();
 
     const double timeCollision = -staticDistanceToWall / dynamicDistanceToWall;
     if (timeCollision >= 0)
         return s.timeOfLastUpdate + timeCollision;
 
-    return -1;
+    return Inf();
 }
 } /* EDMD */

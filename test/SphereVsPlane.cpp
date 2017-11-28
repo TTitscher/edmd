@@ -42,5 +42,5 @@ BOOST_AUTO_TEST_CASE(Grow)
     s.velocity = VelocityAfterCollision(s, p);
 
     // no more collisions expected
-    BOOST_CHECK_CLOSE(PredictedCollisionTime(s, p), -1., 1.e-10);
+    BOOST_CHECK_CLOSE(PredictedCollisionTime(s, p), Inf(), 1.e-10);
 }
