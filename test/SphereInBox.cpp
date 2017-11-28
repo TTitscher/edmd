@@ -4,6 +4,8 @@
 
 using namespace EDMD;
 
+constexpr double EPS = 1.e-4;
+
 std::vector<Plane> UnitBox()
 {
     std::vector<Plane> planes;
@@ -43,12 +45,32 @@ Sphere SimulateSphereInUnitBox(Sphere sphere, int numEvents)
     return sphere;
 }
 
-BOOST_AUTO_TEST_CASE(SphereInBox)
+BOOST_AUTO_TEST_CASE(SphereInBoxGrow)
+{
+    Sphere s;
+    s.position = Eigen::Vector3d(0.5, 0.5, 0.5);
+    s.velocity = Eigen::Vector3d::Zero();
+    s.radius = 0;
+    s.growthRate = 1;
+    BOOST_CHECK_GT(SimulateSphereInUnitBox(s, 1).radius, 0.5 - EPS);
+}
+
+BOOST_AUTO_TEST_CASE(SphereInBoxSimultaneousEvents)
+{
+    Sphere s;
+    s.position = Eigen::Vector3d(0.5, 0.5, 0.5);
+    s.velocity = Eigen::Vector3d::Ones(); // simultaneous collision with 3 walls
+    s.radius = 0;
+    s.growthRate = 1;
+    BOOST_CHECK_GT(SimulateSphereInUnitBox(s, 1000).radius, 0.5 - EPS);
+}
+
+BOOST_AUTO_TEST_CASE(SphereInBoxRandomVelocity)
 {
     Sphere s;
     s.position = Eigen::Vector3d(0.5, 0.5, 0.5);
     s.velocity = Eigen::Vector3d::Random();
     s.radius = 0;
     s.growthRate = 1;
-    BOOST_CHECK_CLOSE(SimulateSphereInUnitBox(s, 10000).radius, 0.5, 1.e-4);
+    BOOST_CHECK_GT(SimulateSphereInUnitBox(s, 1000).radius, 0.5 - EPS);
 }
