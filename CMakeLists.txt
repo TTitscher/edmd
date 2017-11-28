@@ -8,5 +8,14 @@ find_package(Eigen3 3.2 REQUIRED NO_MODULE)
 
 include_directories(src)
 
+
+find_package(benchmark)
+if(benchmark_FOUND)
+    message(STATUS "GoogleBenchmark found")
+    add_subdirectory(benchmark)
+else()
+    message(STATUS "GoogleBenchmark NOT found - Benchmarks won't be build!")
+endif()
+
 enable_testing()
 add_subdirectory(test)
