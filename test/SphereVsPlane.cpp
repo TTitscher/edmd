@@ -13,7 +13,6 @@ BOOST_AUTO_TEST_CASE(NoGrow)
     s.growthRate = 0;
 
     Plane p(Eigen::Vector3d(10, 0, 0), Eigen::Vector3d(-1, 0, 0));
-    BOOST_TEST_MESSAGE("" << p.position);
 
     const double expected = 8;
     BOOST_CHECK_CLOSE(PredictedCollisionTime(s, p), expected, 1.e-10);

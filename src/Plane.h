@@ -3,15 +3,27 @@
 
 namespace EDMD
 {
-struct Plane
+class Plane
 {
-    explicit Plane(Eigen::Vector3d position, Eigen::Vector3d direction)
-        : position(position)
-        , direction(direction.normalized())
+public:
+    Plane(Eigen::Vector3d position, Eigen::Vector3d direction)
+        : mPosition(position)
+        , mDirection(direction.normalized())
     {
     }
 
-    const Eigen::Vector3d position;
-    const Eigen::Vector3d direction;
+    Eigen::Vector3d Position() const
+    {
+        return mPosition;
+    }
+
+    Eigen::Vector3d Direction() const
+    {
+        return mDirection;
+    }
+
+private:
+    Eigen::Vector3d mPosition;
+    Eigen::Vector3d mDirection;
 };
 } /* EDMD */
