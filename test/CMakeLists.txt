@@ -1,5 +1,6 @@
 foreach(unittest 
         Id
+        Sphere
         SphereVsSphere 
         SphereVsPlane
         )

@@ -11,14 +11,9 @@ void Run(size_t numSpheres)
 {
     auto box = Box(-Eigen::Vector3d::Ones(), Eigen::Vector3d::Ones());
 
-    std::vector<Sphere> spheres(numSpheres);
-    for (Sphere& sphere : spheres)
-    {
-        sphere.position = Eigen::Vector3d::Random();
-        sphere.velocity = Eigen::Vector3d::Random();
-        sphere.radius = 0;
-        sphere.growthRate = 1;
-    }
+    std::vector<Sphere> spheres;
+    for (int i = 0; i < numSpheres; ++i)
+        Sphere s(Eigen::Vector3d::Random(), Eigen::Vector3d::Random(), 0, 1, i);
 }
 
 

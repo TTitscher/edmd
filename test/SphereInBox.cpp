@@ -27,38 +27,27 @@ Sphere SimulateSphereInUnitBox(Sphere sphere, int numEvents)
             }
         }
 
-        MoveAndGrow(sphere, closestEventTime);
-        sphere.velocity = VelocityAfterCollision(sphere, closestEventPlane);
+        sphere.MoveAndGrow(closestEventTime);
+        sphere.Velocity(VelocityAfterCollision(sphere, closestEventPlane));
     }
     return sphere;
 }
 
 BOOST_AUTO_TEST_CASE(SphereInBoxGrow)
 {
-    Sphere s;
-    s.position = Eigen::Vector3d(0.5, 0.5, 0.5);
-    s.velocity = Eigen::Vector3d::Zero();
-    s.radius = 0;
-    s.growthRate = 1;
-    BOOST_CHECK_GT(SimulateSphereInUnitBox(s, 1).radius, 0.5 - EPS);
+    Sphere s(Eigen::Vector3d(0.5, 0.5, 0.5), Eigen::Vector3d::Zero(), 0, 1, 0);
+    BOOST_CHECK_GT(SimulateSphereInUnitBox(s, 1).Radius(), 0.5 - EPS);
 }
 
 BOOST_AUTO_TEST_CASE(SphereInBoxSimultaneousEvents)
 {
-    Sphere s;
-    s.position = Eigen::Vector3d(0.5, 0.5, 0.5);
-    s.velocity = Eigen::Vector3d::Ones(); // simultaneous collision with 3 walls
-    s.radius = 0;
-    s.growthRate = 1;
-    BOOST_CHECK_GT(SimulateSphereInUnitBox(s, 1000).radius, 0.5 - EPS);
+    Sphere s(Eigen::Vector3d(0.5, 0.5, 0.5), Eigen::Vector3d::Ones(), 0, 1, 0);
+    // simultaneous collision with 3 walls
+    BOOST_CHECK_GT(SimulateSphereInUnitBox(s, 1000).Radius(), 0.5 - EPS);
 }
 
 BOOST_AUTO_TEST_CASE(SphereInBoxRandomVelocity)
 {
-    Sphere s;
-    s.position = Eigen::Vector3d(0.5, 0.5, 0.5);
-    s.velocity = Eigen::Vector3d::Random();
-    s.radius = 0;
-    s.growthRate = 1;
-    BOOST_CHECK_GT(SimulateSphereInUnitBox(s, 1000).radius, 0.5 - EPS);
+    Sphere s(Eigen::Vector3d(0.5, 0.5, 0.5), Eigen::Vector3d::Random(), 0, 1, 0);
+    BOOST_CHECK_GT(SimulateSphereInUnitBox(s, 1000).Radius(), 0.5 - EPS);
 }
