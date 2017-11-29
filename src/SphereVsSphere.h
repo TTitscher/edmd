@@ -57,6 +57,8 @@ std::pair<Eigen::Vector3d, Eigen::Vector3d> VelocityAfterCollision(Sphere s1, Sp
 
 double PredictedCollisionTime(Sphere s1, Sphere s2)
 {
+    if (s1.Id() == s2.Id())
+        return Inf();
     // sync both spheres to the more recent time
     if (s1.TimeOfLastUpdate() > s2.TimeOfLastUpdate())
         std::swap(s1, s2);

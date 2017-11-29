@@ -41,3 +41,11 @@ BOOST_AUTO_TEST_CASE(Grow)
     // no more collisions expected
     BOOST_CHECK_CLOSE(PredictedCollisionTime(s1, s2), Inf(), 1.e-10);
 }
+
+BOOST_AUTO_TEST_CASE(Identical)
+{
+    Sphere s(Eigen::Vector3d(0, 0, 0), Eigen::Vector3d(0, 0, 0), 2, 0, 0);
+
+    const double expected = Inf();
+    BOOST_CHECK_CLOSE(PredictedCollisionTime(s, s), expected, 1.e-10);
+}
