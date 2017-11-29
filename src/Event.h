@@ -1,5 +1,7 @@
 #pragma once
 #include <cassert>
+#include <iomanip>
+#include <ostream>
 
 namespace EDMD
 {
@@ -41,4 +43,37 @@ private:
     int mFirst;
     int mSecond;
 };
+
+
+class EventInfo
+{
+public:
+    EventInfo(Event e, int n)
+        : mE(e)
+        , mN(n)
+    {
+    }
+
+    friend std::ostream& operator<<(std::ostream& out, EventInfo eventInfo)
+    {
+        const auto& e = eventInfo.mE;
+        out.precision(15);
+        out << "t=" << std::setw(20) << e.Time() << ": " << eventInfo.EventType() << " between " << e.First() << " and "
+            << e.Second();
+        return out;
+    }
+
+    std::string EventType() const
+    {
+        if (mE.Second() < mN)
+            return "Sphere collision";
+        else
+            return " Wall  collision";
+    }
+
+private:
+    Event mE;
+    int mN;
+};
+
 } /* EDMD */
