@@ -20,9 +20,21 @@ public:
         assert(first < second);
     }
 
+    Event(const Event&) = default;
+    Event(Event&&) = default;
+
+    Event& operator=(const Event&) = default;
+    Event& operator=(Event&&) = default;
+
+
     bool operator<(const Event& other) const
     {
-        return Time() < other.Time();
+        // return Time() < other.Time();
+        if (Time() != other.Time())
+            return Time() < other.Time();
+        if (First() != other.First())
+            return First() < other.First();
+        return Second() < other.Second();
     }
 
     double Time() const

@@ -60,7 +60,7 @@ double PredictedCollisionTime(Sphere s1, Sphere s2)
     if (s1.Id() == s2.Id())
         return Inf();
     // sync both spheres to the more recent time
-    if (s1.TimeOfLastUpdate() > s2.TimeOfLastUpdate())
+    if (s1.TimeOfLastUpdate() < s2.TimeOfLastUpdate())
         std::swap(s1, s2);
 
     const double baseTime = s1.TimeOfLastUpdate();
