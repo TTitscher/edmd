@@ -1,23 +1,11 @@
 #include "BoostUnitTest.h"
+#include "Box.h"
 #include "Constants.h"
 #include "SphereVsPlane.h"
 
 using namespace EDMD;
 
 constexpr double EPS = 1.e-4;
-
-std::vector<Plane> UnitBox()
-{
-    std::vector<Plane> planes;
-    planes.push_back(Plane(Eigen::Vector3d(0, 0, 0), Eigen::Vector3d(1, 0, 0)));
-    planes.push_back(Plane(Eigen::Vector3d(0, 0, 0), Eigen::Vector3d(0, 1, 0)));
-    planes.push_back(Plane(Eigen::Vector3d(0, 0, 0), Eigen::Vector3d(0, 0, 1)));
-
-    planes.push_back(Plane(Eigen::Vector3d(1, 1, 1), Eigen::Vector3d(-1, 0, 0)));
-    planes.push_back(Plane(Eigen::Vector3d(1, 1, 1), Eigen::Vector3d(0, -1, 0)));
-    planes.push_back(Plane(Eigen::Vector3d(1, 1, 1), Eigen::Vector3d(0, 0, -1)));
-    return planes;
-}
 
 //! @brief Single `sphere` in a unit box growing for `numEvents` events
 //! @return sphere after numEvents collisions
