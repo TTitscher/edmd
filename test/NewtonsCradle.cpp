@@ -1,14 +1,9 @@
 #include "BoostUnitTest.h"
 
-#include "Box.h"
 #include "Simulation.h"
 #include "Utils.h"
 
-#include <iostream>
-
 using namespace EDMD;
-constexpr double EPS = 1.e-4;
-
 
 BOOST_AUTO_TEST_CASE(SpheresInBox)
 {
@@ -27,8 +22,6 @@ BOOST_AUTO_TEST_CASE(SpheresInBox)
 
     Simulation simulation(spheres, {/* no walls */});
     simulation.SetDebug(true);
-
-    std::cout << "blub" << std::endl;
 
     const int numExpectedCollisions = 4; // 4 vs 3, 3 vs 2, 2 vs 1, 1 vs0
     const int expectedCollisionTime = 2.;
