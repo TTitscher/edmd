@@ -42,10 +42,26 @@ BOOST_AUTO_TEST_CASE(Grow)
     BOOST_CHECK_CLOSE(PredictedCollisionTime(s1, s2), Inf(), 1.e-10);
 }
 
+BOOST_AUTO_TEST_CASE(DelayedState)
+{
+    Sphere s1(Eigen::Vector3d(0, 0, 0), Eigen::Vector3d(0, 0, 0), 2, 0, 0);
+    Sphere s2(Eigen::Vector3d(10, 0, 0), Eigen::Vector3d(-2, 0, 0), 2, 0, 1);
+
+    const double expected = 3;
+    BOOST_CHECK_CLOSE(PredictedCollisionTime(s1, s2), expected, 1.e-10);
+    BOOST_CHECK_CLOSE(PredictedCollisionTime(s2, s1), expected, 1.e-10);
+
+    s1.MoveAndGrow(1.);
+    BOOST_CHECK_CLOSE(PredictedCollisionTime(s1, s2), expected, 1.e-10);
+    BOOST_CHECK_CLOSE(PredictedCollisionTime(s2, s1), expected, 1.e-10);
+
+    s2.MoveAndGrow(2.);
+    BOOST_CHECK_CLOSE(PredictedCollisionTime(s1, s2), expected, 1.e-10);
+    BOOST_CHECK_CLOSE(PredictedCollisionTime(s2, s1), expected, 1.e-10);
+}
+
 BOOST_AUTO_TEST_CASE(Identical)
 {
     Sphere s(Eigen::Vector3d(0, 0, 0), Eigen::Vector3d(0, 0, 0), 2, 0, 0);
-
-    const double expected = Inf();
-    BOOST_CHECK_CLOSE(PredictedCollisionTime(s, s), expected, 1.e-10);
+    BOOST_CHECK_CLOSE(PredictedCollisionTime(s, s), Inf(), 1.e-10);
 }
