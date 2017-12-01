@@ -1,5 +1,6 @@
 foreach(unittest 
         Id
+        Checks
         Sphere
         SphereVsSphere 
         SphereVsPlane
@@ -14,6 +15,7 @@ endforeach()
 foreach(integrationtest 
         SphereInBox 
         SpheresInBox 
+        NewtonsCradle 
         )
 
     add_executable(${integrationtest} ${integrationtest}.cpp)

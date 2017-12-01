@@ -6,9 +6,8 @@
 #include <iostream>
 
 using namespace EDMD;
-constexpr double EPS = 1.e-4;
 
-BOOST_AUTO_TEST_CASE(SpheresInBox)
+BOOST_AUTO_TEST_CASE(EightSpheresInBox)
 {
     auto walls = Box(-Eigen::Vector3d::Ones(), Eigen::Vector3d::Ones());
     std::vector<Sphere> spheres;
@@ -20,10 +19,10 @@ BOOST_AUTO_TEST_CASE(SpheresInBox)
 
     Simulation simulation(spheres, walls);
     double currentTime = 0;
-    for (int i = 0; i < 2e4; ++i)
+    for (int i = 0; i < 1e3; ++i)
         currentTime = simulation.DoStep();
 
 
     spheres.front().MoveAndGrow(currentTime);
-    BOOST_CHECK_GT(spheres.front().Radius(), 0.5 - EPS);
+    BOOST_CHECK_GT(spheres.front().Radius(), 0.49);
 }

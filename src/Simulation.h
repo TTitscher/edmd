@@ -1,10 +1,14 @@
 #pragma once
 
+#include <iostream>
+#include <set>
+#include <vector>
+
+#include "Checks.h"
 #include "Event.h"
 #include "SphereVsPlane.h"
 #include "SphereVsSphere.h"
-#include <set>
-#include <vector>
+
 
 namespace EDMD
 {
@@ -16,12 +20,15 @@ public:
         , mWalls(planes)
         , N(spheres.size())
     {
+        CheckUniqueIds(spheres);
         Initialize();
     }
 
     double DoStep()
     {
         Event e = PopNext();
+        if (mDebug)
+            std::cout << "Processing " << EventInfo(e, N) << "\n";
         PerformCollision(e);
         RemoveOldEvents(e);
 
@@ -29,6 +36,11 @@ public:
         if (e.Second() < N)
             AddAllEvents(mSpheres[e.Second()], e.Time());
         return e.Time();
+    }
+
+    void SetDebug(bool debug)
+    {
+        mDebug = debug;
     }
 
 private:
@@ -76,8 +88,11 @@ private:
 
     Event PopNext()
     {
-        Event next = *mGlobalEvents.begin();
-        mGlobalEvents.erase(mGlobalEvents.begin());
+        auto it = mGlobalEvents.begin();
+        if (it == mGlobalEvents.end())
+            throw std::runtime_error("Empty global event list!");
+        Event next = *it;
+        mGlobalEvents.erase(it);
         return next;
     }
 
@@ -103,14 +118,14 @@ private:
         for (const auto& sphere : mSpheres)
         {
             double t = PredictedCollisionTime(s, sphere);
-            if (t != Inf() && t > time)
+            if (t != Inf() && t >= time)
                 events.push_back(Event(t, std::min(s.Id(), sphere.Id()), std::max(s.Id(), sphere.Id())));
         }
 
         for (size_t i = 0; i < mWalls.size(); ++i)
         {
             double t = PredictedCollisionTime(s, mWalls[i]);
-            if (t != Inf() && t > time)
+            if (t != Inf() && t >= time)
                 events.push_back(Event(t, s.Id(), i + numSpheres));
         }
         return events;
@@ -122,5 +137,7 @@ private:
     std::set<Event> mGlobalEvents;
 
     int N;
+
+    bool mDebug = false;
 };
 } /* EDMD */
