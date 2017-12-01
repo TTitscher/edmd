@@ -16,6 +16,7 @@ foreach(integrationtest
         SphereInBox 
         SpheresInBox 
         NewtonsCradle 
+        EventInvalidation 
         )
 
     add_executable(${integrationtest} ${integrationtest}.cpp)
