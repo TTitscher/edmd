@@ -56,6 +56,12 @@ private:
     int mSecond;
 };
 
+enum class EventType
+{
+    SPHERE,
+    WALL
+};
+
 
 class EventInfo
 {
@@ -70,17 +76,26 @@ public:
     {
         const auto& e = eventInfo.mE;
         out.precision(15);
-        out << "t=" << std::setw(20) << e.Time() << ": " << eventInfo.EventType() << " between " << e.First() << " and "
-            << e.Second();
+        out << "t=" << std::setw(20) << e.Time() << ": " << to_string(eventInfo.Type()) << " between " << e.First()
+            << " and " << e.Second();
         return out;
     }
 
-    std::string EventType() const
+    EventType Type() const
     {
         if (mE.Second() < mN)
-            return "Sphere collision";
+            return EventType::SPHERE;
         else
+            return EventType::WALL;
+    }
+
+    static std::string to_string(EventType t)
+    {
+        if (t == EventType::SPHERE)
+            return "Sphere collision";
+        if (t == EventType::WALL)
             return " Wall  collision";
+        throw;
     }
 
 private:
