@@ -12,6 +12,7 @@ class Sphere:
 
     def update(self, dt):
         self._p += self._v * dt
+        self._r += dt
         if (self._p[0] > 10):
             self._v[0] = -10;
         if (self._p[0] < -10):
@@ -23,24 +24,33 @@ def ReferenceSphere(resolution = 20):
     sphere.SetPhiResolution(resolution/2)
     return sphere
 
-def DefinePositions(spheres):
+def DefineVisuData(spheres):
     positions = vtk.vtkPoints()
+    radii = vtk.vtkFloatArray()
+    velocities = vtk.vtkPoints()
     for sphere in spheres:
         positions.InsertNextPoint(sphere._p)
-    return positions
+        radii.InsertNextValue(sphere._r)
+        velocities.InsertNextPoint(sphere._v)
+    return positions, radii, velocities
 
-def UpdatePositions(positions, spheres):
+def UpdateVisualization(spheres, visuData):
+    positions, radii, velocities = visuData 
     for i in range(len(spheres)):
         positions.SetPoint(i, spheres[i]._p)
+        radii.SetValue(i, spheres[i]._r)
+        velocities.SetPoint(i, spheres[i]._v)
 
 
 spheres = list()
 for i in range(100):
     spheres.append(Sphere(np.array([0.,3.*i,0.]), 1, np.array([10.,0.,0.])))
 
-positions = DefinePositions(spheres)
+visuData = DefineVisuData(spheres)
+positions, radii, velocities = visuData 
 polydata = vtk.vtkPolyData()
 polydata.SetPoints(positions)
+polydata.GetPointData().SetScalars(radii)
 
 glyph = vtk.vtkPolyData()
 sphereSource = ReferenceSphere()
@@ -96,7 +106,7 @@ def update_scene(*args):
 
     for sphere in spheres:
         sphere.update(dt)
-    UpdatePositions(positions, spheres)
+    UpdateVisualization(spheres, visuData)
     positions.Modified()
     t_update = time.time()
 
