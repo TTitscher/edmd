@@ -6,6 +6,13 @@
 
 namespace EDMD
 {
+
+enum class EventType
+{
+    SPHERE,
+    WALL
+};
+
 class EventInfo
 {
 public:

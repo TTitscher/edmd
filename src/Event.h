@@ -1,4 +1,5 @@
 #pragma once
+#include <algorithm>
 #include <cassert>
 
 namespace EDMD
@@ -11,11 +12,10 @@ public:
     //! @param first
     Event(double time, int first, int second)
         : mTime(time)
-        , mFirst(first)
-        , mSecond(second)
+        , mFirst(std::min(first, second))
+        , mSecond(std::max(first, second))
     {
         assert(first >= 0);
-        assert(first < second);
     }
 
     Event(const Event&) = default;
@@ -52,12 +52,6 @@ private:
     double mTime;
     int mFirst;
     int mSecond;
-};
-
-enum class EventType
-{
-    SPHERE,
-    WALL
 };
 
 

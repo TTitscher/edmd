@@ -115,15 +115,6 @@ private:
 
         // clear local event list
         mLocalEvents[sphereId].clear();
-
-        // std::remove_if does not work on std::set.
-        // for (auto it = mGlobalEvents.begin(); it != mGlobalEvents.end();)
-        //{
-        // if (it->First() == sphereId || it->Second() == sphereId)
-        // it = mGlobalEvents.erase(it);
-        // else
-        //++it;
-        //}
     }
 
     Event PopNext()
@@ -157,21 +148,20 @@ private:
 
     std::vector<Event> FindAllEvents(const Sphere& s, double time) const
     {
-        const size_t numSpheres = mSpheres.size();
         std::vector<Event> events;
 
         for (const auto& sphere : mSpheres)
         {
             double t = PredictedCollisionTime(s, sphere);
             if (t != Inf() && t >= time)
-                events.push_back(Event(t, std::min(s.Id(), sphere.Id()), std::max(s.Id(), sphere.Id())));
+                events.push_back(Event(t, s.Id(), sphere.Id()));
         }
 
         for (size_t i = 0; i < mWalls.size(); ++i)
         {
             double t = PredictedCollisionTime(s, mWalls[i]);
             if (t != Inf() && t >= time)
-                events.push_back(Event(t, s.Id(), i + numSpheres));
+                events.push_back(Event(t, s.Id(), i + N));
         }
         return events;
     }
