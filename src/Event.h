@@ -1,7 +1,5 @@
 #pragma once
 #include <cassert>
-#include <iomanip>
-#include <ostream>
 
 namespace EDMD
 {
@@ -63,4 +61,4 @@ enum class EventType
 };
 
 
-} /* EDMD */
+} // namespace EDMD

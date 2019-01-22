@@ -6,54 +6,20 @@
 
 #include "Checks.h"
 #include "Event.h"
+#include "EventInfo.h"
 #include "SphereVsPlane.h"
 #include "SphereVsSphere.h"
 
-
 namespace EDMD
 {
+
+
+class EventLists
+{
+};
+
 class Simulation
 {
-    class EventInfo
-    {
-    public:
-        EventInfo(Event e, int n)
-            : mE(e)
-            , mN(n)
-        {
-        }
-
-        friend std::ostream& operator<<(std::ostream& out, EventInfo eventInfo)
-        {
-            const auto& e = eventInfo.mE;
-            out.precision(15);
-            out << "t=" << std::setw(20) << e.Time() << ": " << to_string(eventInfo.Type()) << " between " << e.First()
-                << " and " << e.Second();
-            return out;
-        }
-
-        EventType Type() const
-        {
-            if (mE.Second() < mN)
-                return EventType::SPHERE;
-            else
-                return EventType::WALL;
-        }
-
-        static std::string to_string(EventType t)
-        {
-            if (t == EventType::SPHERE)
-                return "Sphere collision";
-            if (t == EventType::WALL)
-                return " Wall  collision";
-            throw;
-        }
-
-    private:
-        Event mE;
-        int mN;
-    };
-
 public:
     Simulation(std::vector<Sphere>& spheres, std::vector<Plane> planes)
         : mSpheres(spheres)
@@ -61,6 +27,7 @@ public:
         , N(spheres.size())
     {
         CheckUniqueIds(spheres);
+        mLocalEvents.resize(N);
         Initialize();
     }
 
@@ -118,16 +85,45 @@ private:
         AddAllEvents(mSpheres[e.First()], e.Time());
     }
 
+    template <typename T>
+    void RemoveOptionally(T& s, Event e)
+    {
+        auto it = s.find(e);
+        if (it != s.end())
+            s.erase(it);
+    }
+
     void RemoveOldEvents(int sphereId)
     {
-        // std::remove_if does not work on std::set.
-        for (auto it = mGlobalEvents.begin(); it != mGlobalEvents.end();)
+        for (Event e : mLocalEvents[sphereId])
         {
-            if (it->First() == sphereId || it->Second() == sphereId)
-                it = mGlobalEvents.erase(it);
-            else
-                ++it;
+            // remove event from other local event list of First
+            if (e.First() != sphereId)
+            {
+                auto& l = mLocalEvents[e.First()];
+                RemoveOptionally(l, e);
+            }
+            // remove event from other local event list of Second
+            if (e.Second() != sphereId and e.Second() < N)
+            {
+                auto& l = mLocalEvents[e.Second()];
+                RemoveOptionally(l, e);
+            }
+            // remove event from global event list
+            RemoveOptionally(mGlobalEvents, e);
         }
+
+        // clear local event list
+        mLocalEvents[sphereId].clear();
+
+        // std::remove_if does not work on std::set.
+        // for (auto it = mGlobalEvents.begin(); it != mGlobalEvents.end();)
+        //{
+        // if (it->First() == sphereId || it->Second() == sphereId)
+        // it = mGlobalEvents.erase(it);
+        // else
+        //++it;
+        //}
     }
 
     Event PopNext()
@@ -151,7 +147,12 @@ private:
     {
         auto events = FindAllEvents(s, t);
         for (auto e : events)
+        {
             mGlobalEvents.insert(e);
+            mLocalEvents[e.First()].insert(e);
+            if (e.Second() < N)
+                mLocalEvents[e.Second()].insert(e);
+        }
     }
 
     std::vector<Event> FindAllEvents(const Sphere& s, double time) const
@@ -179,10 +180,10 @@ private:
     std::vector<Plane> mWalls;
 
     std::set<Event> mGlobalEvents;
-    std::vector<Event*> mLocalEvents;
+    std::vector<std::set<Event>> mLocalEvents;
 
     int N;
 
     bool mDebug = false;
 };
-} /* EDMD */
+} // namespace EDMD

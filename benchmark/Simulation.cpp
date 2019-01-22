@@ -25,6 +25,6 @@ static void SpheresInBox(benchmark::State& state)
     state.SetComplexityN(state.range(0));
 }
 
-BENCHMARK(SpheresInBox)->RangeMultiplier(2)->Range(4, 64)->Complexity();
+BENCHMARK(SpheresInBox)->RangeMultiplier(2)->Range(4, 1024)->Complexity();
 
 BENCHMARK_MAIN();
