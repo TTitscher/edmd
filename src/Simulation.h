@@ -14,8 +14,75 @@ namespace EDMD
 {
 
 
-class EventLists
+class GlobalEvents
 {
+public:
+    GlobalEvents(size_t N)
+        : N(N)
+    {
+        mLocalEvents.resize(N);
+    }
+
+    //! @brief Returns the most recent event and removes it from the global event list
+    Event PopNext()
+    {
+        auto it = mGlobalEvents.begin();
+        if (it == mGlobalEvents.end())
+            throw std::runtime_error("Empty global event list!");
+        Event next = *it;
+        mGlobalEvents.erase(it);
+        return next;
+    }
+
+    //! @brief Add to global and local event lists
+    void AddEvent(Event e)
+    {
+        mGlobalEvents.insert(e);
+        assert(IsSphere(e.First()));
+        mLocalEvents[e.First()].insert(e);
+        if (IsSphere(e.Second()))
+            mLocalEvents[e.Second()].insert(e);
+    }
+
+    //! @brief Remove `e` and all corresponding events from the local and global event lists
+    //! @remark A corresponding event is an event that includes the same spheres as `e`
+    void RemoveCorrespondingEvents(Event e)
+    {
+        // should be removed from mGlobalEvents via PopNext()
+        assert(mGlobalEvents.find(e) == mGlobalEvents.end());
+        RemoveCorrespondingEvents(e.First());
+        RemoveCorrespondingEvents(e.Second());
+    }
+
+
+private:
+    void RemoveCorrespondingEvents(int id)
+    {
+        if (not IsSphere(id))
+            return;
+        std::set<Event>& correspondingEvents = mLocalEvents[id];
+        for (Event e : correspondingEvents)
+        {
+            mGlobalEvents.erase(e);
+            // if e.First() == id then mLocalEvents[e.First()] == correspondingEvents
+            // So deleting from it would invalidate the surrounding loop
+            // over correspondingEvents.
+            if (e.First() != id)
+                mLocalEvents[e.First()].erase(e);
+            if (e.Second() != id and IsSphere(e.Second()))
+                mLocalEvents[e.Second()].erase(e);
+        }
+        correspondingEvents.clear();
+    }
+
+    bool IsSphere(int id) const
+    {
+        return id < N;
+    }
+
+    size_t N;
+    std::vector<std::set<Event>> mLocalEvents;
+    std::set<Event> mGlobalEvents;
 };
 
 class Simulation
@@ -24,16 +91,16 @@ public:
     Simulation(std::vector<Sphere>& spheres, std::vector<Plane> planes)
         : mSpheres(spheres)
         , mWalls(planes)
+        , mEvents(spheres.size())
         , N(spheres.size())
     {
         CheckUniqueIds(spheres);
-        mLocalEvents.resize(N);
-        Initialize();
+        InitialEventLists();
     }
 
     double DoStep()
     {
-        Event e = PopNext();
+        Event e = mEvents.PopNext();
         EventInfo eInfo(e, N);
         if (mDebug)
             std::cout << "Processing " << eInfo << "\n";
@@ -68,8 +135,7 @@ private:
         s1.Velocity(v1);
         s2.Velocity(v2);
 
-        RemoveOldEvents(e.First());
-        RemoveOldEvents(e.Second());
+        mEvents.RemoveCorrespondingEvents(e);
         AddAllEvents(mSpheres[e.First()], e.Time());
         AddAllEvents(mSpheres[e.Second()], e.Time());
     }
@@ -81,97 +147,38 @@ private:
         s.MoveAndGrow(e.Time());
         s.Velocity(VelocityAfterCollision(s, p));
 
-        RemoveOldEvents(e.First());
+        mEvents.RemoveCorrespondingEvents(e);
         AddAllEvents(mSpheres[e.First()], e.Time());
     }
 
-    template <typename T>
-    void RemoveOptionally(T& s, Event e)
-    {
-        auto it = s.find(e);
-        if (it != s.end())
-            s.erase(it);
-    }
-
-    void RemoveOldEvents(int sphereId)
-    {
-        for (Event e : mLocalEvents[sphereId])
-        {
-            // remove event from other local event list of First
-            if (e.First() != sphereId)
-            {
-                auto& l = mLocalEvents[e.First()];
-                RemoveOptionally(l, e);
-            }
-            // remove event from other local event list of Second
-            if (e.Second() != sphereId and e.Second() < N)
-            {
-                auto& l = mLocalEvents[e.Second()];
-                RemoveOptionally(l, e);
-            }
-            // remove event from global event list
-            RemoveOptionally(mGlobalEvents, e);
-        }
-
-        // clear local event list
-        mLocalEvents[sphereId].clear();
-    }
-
-    Event PopNext()
-    {
-        auto it = mGlobalEvents.begin();
-        if (it == mGlobalEvents.end())
-            throw std::runtime_error("Empty global event list!");
-        Event next = *it;
-        mGlobalEvents.erase(it);
-        return next;
-    }
-
     //! @brief builds the initial global event list
-    void Initialize()
+    void InitialEventLists(double t = 0)
     {
         for (const auto& s : mSpheres)
-            AddAllEvents(s, 0.);
+            AddAllEvents(s, t);
     }
 
     void AddAllEvents(const Sphere& s, double t)
     {
-        auto events = FindAllEvents(s, t);
-        for (auto e : events)
-        {
-            mGlobalEvents.insert(e);
-            mLocalEvents[e.First()].insert(e);
-            if (e.Second() < N)
-                mLocalEvents[e.Second()].insert(e);
-        }
-    }
-
-    std::vector<Event> FindAllEvents(const Sphere& s, double time) const
-    {
-        std::vector<Event> events;
-
         for (const auto& sphere : mSpheres)
         {
             double t = PredictedCollisionTime(s, sphere);
-            if (t != Inf() && t >= time)
-                events.push_back(Event(t, s.Id(), sphere.Id()));
+            if (t != Inf())
+                mEvents.AddEvent(Event(t, s.Id(), sphere.Id()));
         }
 
         for (size_t i = 0; i < mWalls.size(); ++i)
         {
             double t = PredictedCollisionTime(s, mWalls[i]);
-            if (t != Inf() && t >= time)
-                events.push_back(Event(t, s.Id(), i + N));
+            if (t != Inf())
+                mEvents.AddEvent(Event(t, s.Id(), i + N));
         }
-        return events;
     }
 
     std::vector<Sphere>& mSpheres;
     std::vector<Plane> mWalls;
 
-    std::set<Event> mGlobalEvents;
-    std::vector<std::set<Event>> mLocalEvents;
-
+    GlobalEvents mEvents;
     int N;
 
     bool mDebug = false;
